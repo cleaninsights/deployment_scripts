@@ -1,0 +1,9 @@
+---
+piwik:
+  mysql:
+    host: localhost
+    admin_user: root
+    admin_pass: icanseeititsinsight
+    piwik_user: piwik
+    piwik_pass: piwik
+    piwik_db: piwik

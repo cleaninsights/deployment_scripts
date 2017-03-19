@@ -1,0 +1,5 @@
+---
+- name: Piwik
+  hosts: piwik
+  roles:
+    - ansible-piwik
