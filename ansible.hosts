@@ -1,7 +1,7 @@
 # 16.04 comes with python3, so we start out by bootstrapping python 2, then move on
 [cleaninsights]
-104.236.8.93 ssl_hostname=bkassembly-piwik-14.jthess.com
-104.236.199.178 ssl_hostname=bkassembly-piwik-15.jthess.com
+# Floating IP
+138.197.55.14 ssl_hostname=demo.cleaninsights.io
 
 [piwik:children]
 cleaninsights
