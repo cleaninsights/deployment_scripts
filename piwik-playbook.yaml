@@ -2,4 +2,14 @@
 - name: Piwik
   hosts: piwik
   roles:
-    - ansible-piwik
+    - role: ansible-letsencrypt
+      letsencrypt_webroot_path: /opt/piwik
+      letsencrypt_email: mgojohn@gmail.com
+      letsencrypt_cert_domains:
+        - "{{ hostvars[ansible_host]['ssl_hostname'] }}"
+      letsencrypt_renewal_command_args: '--renew-hook "systemctl restart nginx"'
+      # To test (using letsencrypt's staging server, uncomment the following line)
+      # letsencrypt_server: https://acme-staging.api.letsencrypt.org/directory
+    - role: ansible-piwik
+      dependencies: 
+      - { role: ansible-letsencrypt }

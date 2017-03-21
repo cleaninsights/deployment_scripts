@@ -1,0 +1,6 @@
+---
+- name: Initialize 16.04 hosts (install appropriate python interpreter)
+  hosts: python-initialize
+  tasks:
+  - name: install python 2
+    raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)

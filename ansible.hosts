@@ -1,3 +1,13 @@
-[piwik]
-174.138.80.196 ansible_python_interpreter=/usr/bin/python
-45.55.159.209 ansible_python_interpreter=/usr/bin/python
+# 16.04 comes with python3, so we start out by bootstrapping python 2, then move on
+[cleaninsights]
+104.236.8.93 ssl_hostname=bkassembly-piwik-14.jthess.com
+104.236.199.178 ssl_hostname=bkassembly-piwik-15.jthess.com
+
+[piwik:children]
+cleaninsights
+
+[piwik:vars]
+ansible_python_interpreter=/usr/bin/python
+
+[python-initialize:children]
+cleaninsights
