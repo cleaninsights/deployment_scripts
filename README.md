@@ -1,3 +1,11 @@
+## Clean insights deployment scripts
+
+Takes a fresh 16.04 image (which you have SSH access to) and makes it into a piwik server.  Be sure to change up the creds when creating a real production instance.
+
+Based on:
+* https://github.com/ICTO/ansible-piwik
+* https://github.com/thefinn93/ansible-letsencrypt
+
 ## Setting up a new Piwik server with TLS
 
 * Create a box, make sure you have ssh access to it.  On digital ocean, this is easy-peasy (just add your public key upon creation).
