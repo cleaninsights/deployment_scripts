@@ -1,0 +1,12 @@
+---
+# Fetch latest release GeoIP database
+- name: "Fetch latest GeoIP database"
+  sudo: yes
+  action: get_url url={{ piwik.geoip.url }}/{{ piwik.geoip.file }} dest={{ piwik.settings.locations.dest }}/misc/ mode=0660 owner={{ piwik.apache.user }} group={{ piwik.apache.group }}
+  register: geoip_db
+
+# Extract GeoIP database
+- name: "Extract GeoIP database"
+  sudo: yes
+  action: shell gunzip -c {{ piwik.settings.locations.dest }}/misc/{{ piwik.geoip.file }} > {{ piwik.settings.locations.dest }}/misc/{{ piwik.geoip.dest }}
+  when: geoip_db.changed

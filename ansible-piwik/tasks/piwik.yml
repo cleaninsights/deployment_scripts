@@ -1,0 +1,68 @@
+---
+- include: dependencies_deb.yml
+  when: ansible_distribution in [ 'Debian', 'Ubuntu' ]
+
+- include: dependencies_rpm.yml
+  when: ansible_distribution in [ 'CentOS', 'RedHat', 'Fedora' ]
+
+- include: db.yml
+
+# Fetch latest release
+- name: "Fetch latest Piwik release"
+  sudo: yes
+  action: get_url url={{ piwik.settings.url }}/{{ piwik.settings.file }} dest={{ piwik.settings.locations.tmp }} mode=0440 owner=root group=root
+
+# Create Piwik destination folder
+- name: "Create Piwik destination folder"
+  sudo: yes
+  action: file path={{ piwik.settings.locations.install }} owner={{ piwik.apache.user }} group={{ piwik.apache.group }} mode=0755 state=directory
+
+# Extract package
+- name: "Extract Piwik zipfile"
+  sudo: yes
+  action: shell unzip -u {{ piwik.settings.locations.tmp }}/{{ piwik.settings.file }} -d {{ piwik.settings.locations.install }}
+
+# Create Piwik temp folders
+- name: "Create Piwik temp folders"
+  sudo: yes
+  action: file path={{ piwik.settings.locations.dest }}/{{ item }} owner={{ piwik.apache.user }} group={{ piwik.apache.group }} mode=0755 state=directory
+  with_items: "{{ piwik.settings.web_writable_dirs }}"
+
+- name: "Make piwik.js writable so we can support plugins"
+  sudo: yes
+  action: file path={{ piwik.settings.locations.dest }}/piwik.js owner={{ piwik.apache.user }} group={{ piwik.apache.group }} mode=0755 state=file
+
+# enable SSL support 
+- name: "Enable ssl for apache"
+  sudo: yes
+  apache2_module: state=present name=ssl
+  notify:
+    - Restart Apache
+
+# Add Piwik Apache alias
+- name: "Configure VirtualHost to point at Piwik for root"
+  sudo: yes
+  action: template src=piwik.j2 dest=/etc/{{ piwik.apache.service }}/conf-enabled/piwik.conf owner={{ piwik.apache.user }} group={{ piwik.apache.group }} mode=0640
+  notify:
+    - Restart Apache
+
+- name: "Allow apache to look outside /var/www/ and to /opt/piwik/"
+  blockinfile:
+    dest: /etc/{{ piwik.apache.service }}/apache2.conf
+    block: |
+      <Directory {{ piwik.settings.locations.dest }}/>
+        Options Indexes FollowSymLinks
+        AllowOverride None
+        Require all granted
+      </Directory>
+  notify:
+    - Restart Apache
+
+# Give piwik access to directories
+
+
+- name: "Start and enable Apache"
+  sudo: yes
+  action: service name={{ piwik.apache.service }} state=started enabled=yes
+
+- include: geoip.yml
